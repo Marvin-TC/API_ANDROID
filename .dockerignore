@@ -1,0 +1,26 @@
+ Carpetas de build
+target/
+build/
+
+# Archivos y carpetas de Git
+.git/
+.gitignore
+
+# IDEs
+.idea/
+.vscode/
+*.iml
+
+# Archivos temporales
+*.log
+*.tmp
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
+
+# Dependencias grandes
+node_modules/
+
+# Archivos sensibles
+.env
