@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Nueva Venta</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    .navbar-mariposa {
+      background: linear-gradient(90deg, #007bff 0%, #00b4d8 100%);
+      color: white;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+    .navbar-mariposa h1 { font-size: 1.8rem; font-weight: bold; margin: 0; }
+    .navbar-mariposa p { font-size: 0.9rem; margin: 0; opacity: 0.9; }
+    .list-group-item:hover { background-color: #f8f9fa; cursor: pointer; }
+    #resultadosBusqueda { max-height: 250px; overflow-y: auto; }
+  </style>
+</head>
+<body class="bg-light">
+
+<nav class="navbar navbar-expand-lg navbar-mariposa mb-4">
+  <div class="container">
+    <div>
+      <h1>Empresa Mariposa</h1>
+      <p>Registro de Ventas</p>
+    </div>
+    <div class="ms-auto">
+      <a class="btn btn-outline-light btn-sm" th:href="@{/clientes}">Clientes</a>
+      <a class="btn btn-outline-light btn-sm" th:href="@{/productos}">Productos</a>
+      <a class="btn btn-outline-light btn-sm" th:href="@{/ventas}">Ventas</a>
+    </div>
+  </div>
+</nav>
+
+<div class="container mt-4">
+  <div class="card shadow-sm">
+    <div class="card-body">
+      <h2 class="fw-bold mb-4">Nueva Venta</h2>
+
+      <form th:action="@{/ventas/guardar}" th:object="${venta}" method="post" id="formVenta">
+
+        <!-- CLIENTE -->
+        <div class="mb-3">
+          <label class="form-label fw-semibold">Cliente</label>
+          <select th:field="*{cliente}" class="form-select" required>
+            <option value="">Seleccione un cliente</option>
+            <option th:each="c : ${clientes}" th:value="${c.id}" th:text="${c.nombres + ' ' + c.apellidos}"></option>
+          </select>
+        </div>
+
+        <!-- VENDEDOR -->
+        <div class="mb-3">
+          <label class="form-label fw-semibold">Vendedor</label>
+          <input type="text" th:field="*{vendedor}" class="form-control" placeholder="Nombre del vendedor" required>
+        </div>
+
+        <hr>
+
+        <!-- BUSCADOR DE PRODUCTOS -->
+        <div class="position-relative mb-3">
+          <div class="input-group">
+            <input type="text" id="buscadorProducto" class="form-control" placeholder="Buscar producto por nombre o código...">
+            <button type="button" class="btn btn-primary" id="btnBuscarProducto">Buscar</button>
+          </div>
+          <ul id="resultadosBusqueda" class="list-group position-absolute w-100 shadow-sm" style="z-index: 10;"></ul>
+        </div>
+
+        <!-- TABLA DE DETALLE -->
+        <table class="table table-bordered align-middle">
+          <thead class="table-secondary">
+          <tr>
+            <th>Producto</th>
+            <th>Precio</th>
+            <th>Cantidad</th>
+            <th>Subtotal</th>
+            <th></th>
+          </tr>
+          </thead>
+          <tbody id="detalleTabla"></tbody>
+        </table>
+
+        <!-- TOTALES -->
+        <div class="d-flex justify-content-end gap-4">
+          <div>
+            <label class="form-label">Descuento</label>
+            <input type="number" step="0.01" th:field="*{descuento}" class="form-control" value="0" id="descuentoInput">
+          </div>
+          <div>
+            <label class="form-label">Total</label>
+            <input type="number" step="0.01" th:field="*{total}" class="form-control" readonly id="totalInput">
+          </div>
+        </div>
+
+        <!-- BOTONES -->
+        <div class="mt-4 d-flex justify-content-end gap-2">
+          <button type="submit" class="btn btn-success px-4">Guardar Venta</button>
+          <a th:href="@{/ventas}" class="btn btn-secondary px-4">Cancelar</a>
+        </div>
+
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const buscador = document.getElementById("buscadorProducto");
+    const resultados = document.getElementById("resultadosBusqueda");
+    const tabla = document.getElementById("detalleTabla");
+    const totalInput = document.getElementById("totalInput");
+    const descuentoInput = document.getElementById("descuentoInput");
+
+    document.getElementById("btnBuscarProducto").addEventListener("click", buscarProducto);
+    buscador.addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); buscarProducto(); } });
+
+    async function buscarProducto() {
+      const termino = buscador.value.trim();
+      resultados.innerHTML = "";
+
+      if (!termino) {
+        resultados.innerHTML = '<li class="list-group-item text-center text-muted">Escriba un nombre o código</li>';
+        return;
+      }
+
+      try {
+        const resp = await fetch(`/ventas/buscar-productos?q=${encodeURIComponent(termino)}`);
+        if (!resp.ok) throw new Error("Error en la búsqueda");
+        const productos = await resp.json();
+
+        resultados.innerHTML = "";
+        if (productos.length === 0) {
+          resultados.innerHTML = '<li class="list-group-item text-center text-muted">Sin resultados</li>';
+          return;
+        }
+
+        productos.forEach(p => {
+          const li = document.createElement("li");
+          li.className = "list-group-item";
+          li.innerHTML = `
+            <div class="d-flex justify-content-between">
+              <span>${p.nombre}</span>
+              <small class="text-muted">Q${p.precioUnidad?.toFixed(2) || 0} | Stock: ${p.stock}</small>
+            </div>
+          `;
+          li.addEventListener("click", () => seleccionarProducto(p));
+          resultados.appendChild(li);
+        });
+      } catch (error) {
+        console.error(error);
+        resultados.innerHTML = '<li class="list-group-item text-danger text-center">Error al buscar productos</li>';
+      }
+    }
+
+    function seleccionarProducto(p) {
+      resultados.innerHTML = "";
+      buscador.value = "";
+
+      const yaExiste = [...tabla.querySelectorAll("input[name='productoId']")]
+        .some(input => parseInt(input.value) === p.id);
+      if (yaExiste) {
+        alert("Este producto ya está en la venta.");
+        return;
+      }
+
+      const fila = document.createElement("tr");
+      fila.innerHTML = `
+        <td>
+          ${p.nombre}
+          <input type="hidden" name="productoId" value="${p.id}">
+        </td>
+        <td>
+          <input type="number" name="precio" class="form-control" value="${p.precioUnidad?.toFixed(2) || 0}" step="0.01" readonly>
+        </td>
+        <td>
+          <input type="number" name="cantidad" class="form-control cantidad" value="1" min="1" max="${p.stock}" onchange="actualizarTotal()">
+        </td>
+        <td class="subtotal text-end">Q${(p.precioUnidad || 0).toFixed(2)}</td>
+        <td class="text-center">
+          <button type="button" class="btn btn-sm btn-danger" onclick="eliminarFila(this)">✕</button>
+        </td>
+      `;
+      tabla.appendChild(fila);
+      actualizarTotal();
+    }
+
+    window.actualizarTotal = function() {
+      let total = 0;
+      tabla.querySelectorAll("tr").forEach(fila => {
+        const precio = parseFloat(fila.querySelector("input[name='precio']").value) || 0;
+        const cantidad = parseInt(fila.querySelector("input[name='cantidad']").value) || 0;
+        const subtotal = precio * cantidad;
+        fila.querySelector(".subtotal").textContent = "Q" + subtotal.toFixed(2);
+        total += subtotal;
+      });
+      const descuento = parseFloat(descuentoInput.value) || 0;
+      totalInput.value = (total - descuento).toFixed(2);
+    };
+
+    window.eliminarFila = function(btn) {
+      btn.closest("tr").remove();
+      actualizarTotal();
+    };
+
+    descuentoInput.addEventListener("input", actualizarTotal);
+  });
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
