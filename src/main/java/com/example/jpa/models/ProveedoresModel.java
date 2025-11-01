@@ -32,13 +32,12 @@ public class ProveedoresModel {
     public ProveedoresModel() {
     }
 
-    public ProveedoresModel(String nombreEmpresa, String direccion, String telefono, String nombreVendedor, String telefonoVendedor, LocalDateTime fechaRegistro) {
+    public ProveedoresModel(String nombreEmpresa, String direccion, String telefono, String nombreVendedor, String telefonoVendedor) {
         this.nombreEmpresa = nombreEmpresa;
         this.direccion = direccion;
         this.telefono = telefono;
         this.nombreVendedor = nombreVendedor;
         this.telefonoVendedor = telefonoVendedor;
-        this.fechaRegistro = fechaRegistro;
     }
     // Getters
     public Long getId() {

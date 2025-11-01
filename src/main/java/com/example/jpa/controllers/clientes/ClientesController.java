@@ -10,6 +10,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 @RestController
 @RequestMapping("/api/clientes")
@@ -26,13 +28,9 @@ public class ClientesController {
     }
 
     @GetMapping
-    public ResponseEntity<?> getAllClientes() {
+    public List<ClientesModel> getAllClientes() {
         List<ClientesModel> clientes = clientesRepository.findAll();
-        if (clientes.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NO_CONTENT)
-                    .body("No hay clientes registrados");
-        }
-        return ResponseEntity.ok(clientes);
+        return clientes;
     }
 
     @GetMapping("/{id}")
@@ -57,6 +55,8 @@ public class ClientesController {
         }
 
         try {
+            ZoneId zonaGT = ZoneId.of("America/Guatemala");
+            cliente.setFechaRegistro(LocalDateTime.now(zonaGT));
             ClientesModel nuevo = clientesRepository.save(cliente);
             return ResponseEntity.status(HttpStatus.CREATED)
                     .body("Cliente creado correctamente con ID " + nuevo.getId());

@@ -6,4 +6,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface ComprasRepository extends JpaRepository<ComprasModel, Long> {
+    boolean existsByProveedor_id(Long id);
+
 }

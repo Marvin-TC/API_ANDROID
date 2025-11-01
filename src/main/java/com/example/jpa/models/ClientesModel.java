@@ -33,13 +33,12 @@ public class ClientesModel {
     public ClientesModel() {
     }
 
-    public ClientesModel(String nombres, String apellidos, String direccion, String nit, String correoElectronico, LocalDateTime fechaRegistro) {
+    public ClientesModel(String nombres, String apellidos, String direccion, String nit, String correoElectronico) {
         this.nombres = nombres;
         this.apellidos = apellidos;
         this.direccion = direccion;
         this.nit = nit;
         this.correoElectronico = correoElectronico;
-        this.fechaRegistro = fechaRegistro;
     }
     // Getters y Setters
 
