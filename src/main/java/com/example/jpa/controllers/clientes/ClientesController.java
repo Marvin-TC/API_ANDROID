@@ -45,7 +45,7 @@ public class ClientesController {
     }
 
     @PostMapping
-    public ResponseEntity<?> createCliente(ClientesModel cliente) {
+    public ResponseEntity<?> createCliente(@RequestBody ClientesModel cliente) {
         if (cliente == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body("Debes enviar un cliente que no sea vacío");
