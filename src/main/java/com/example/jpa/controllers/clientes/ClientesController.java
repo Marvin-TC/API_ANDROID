@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
-
 @RestController
 @RequestMapping("/api/clientes")
 public class ClientesController {
@@ -27,89 +26,88 @@ public class ClientesController {
     }
 
     @GetMapping
-    public List<ClientesModel> getAllClientes() {
+    public ResponseEntity<?> getAllClientes() {
         List<ClientesModel> clientes = clientesRepository.findAll();
         if (clientes.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.NO_CONTENT, "No hay clientes registrados");
+            return ResponseEntity.status(HttpStatus.NO_CONTENT)
+                    .body("No hay clientes registrados");
         }
-        return clientes;
+        return ResponseEntity.ok(clientes);
     }
 
     @GetMapping("/{id}")
-    public ClientesModel getClienteById(@PathVariable Long id) {
+    public ResponseEntity<?> getClienteById(@PathVariable Long id) {
         return clientesRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND,
-                        "El cliente con ID " + id + " no existe"
-                ));
+                .<ResponseEntity<?>>map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity
+                        .status(HttpStatus.NOT_FOUND)
+                        .body("El cliente con ID " + id + " no existe"));
     }
 
     @PostMapping
-    public ClientesModel createCliente(ClientesModel cliente) {
-        if (cliente==null){throw new ResponseStatusException(HttpStatus.NO_CONTENT,"debes enviar un cliente que no sea vacio");}
+    public ResponseEntity<?> createCliente(ClientesModel cliente) {
+        if (cliente == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("Debes enviar un cliente que no sea vacío");
+        }
 
         if (cliente.getNit() != null && clientesRepository.existsByNit(cliente.getNit())) {
-            throw new ResponseStatusException(
-                    HttpStatus.CONFLICT,
-                    "Ya existe un cliente con el NIT " + cliente.getNit()
-            );
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .body("Ya existe un cliente con el NIT " + cliente.getNit());
         }
+
         try {
-            return clientesRepository.save(cliente);
+            ClientesModel nuevo = clientesRepository.save(cliente);
+            return ResponseEntity.status(HttpStatus.CREATED)
+                    .body("Cliente creado correctamente con ID " + nuevo.getId());
         } catch (Exception ex) {
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST,
-                    "Error al crear el cliente: " + ex.getMessage()
-            );
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("Error al crear el cliente: " + ex.getMessage());
         }
     }
 
     @PutMapping("/{id}")
-    public ClientesModel updateCliente(@PathVariable Long id, ClientesModel clienteDetails) {
+    public ResponseEntity<?> updateCliente(@PathVariable Long id, @RequestBody ClientesModel clienteDetails) {
         ClientesModel cliente = clientesRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND,
-                        "No se puede actualizar: el cliente con ID " + id + " no existe"
-                ));
+                .orElse(null);
+        if (cliente == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("No se puede actualizar: el cliente con ID " + id + " no existe");
+        }
+
         try {
             cliente.setNombres(clienteDetails.getNombres());
             cliente.setApellidos(clienteDetails.getApellidos());
             cliente.setDireccion(clienteDetails.getDireccion());
             cliente.setNit(clienteDetails.getNit());
             cliente.setCorreoElectronico(clienteDetails.getCorreoElectronico());
-            return clientesRepository.save(cliente);
+            clientesRepository.save(cliente);
+            return ResponseEntity.ok("Cliente actualizado correctamente.");
         } catch (Exception ex) {
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST,
-                    "Error al actualizar el cliente: " + ex.getMessage()
-            );
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("Error al actualizar el cliente: " + ex.getMessage());
         }
     }
 
     @DeleteMapping("/{id}")
-    public void deleteCliente(@PathVariable Long id) {
+    public ResponseEntity<?> deleteCliente(@PathVariable Long id) {
         if (!clientesRepository.existsById(id)) {
-            throw new ResponseStatusException(
-                    HttpStatus.NOT_FOUND,
-                    "No se puede eliminar: el cliente con ID " + id + " no existe"
-            );
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("No se puede eliminar: el cliente con ID " + id + " no existe");
         }
 
-        //VALIDAR SI NO TIENE VENTAS YA REGISTRADAS para no eliminar
-        if (ventasRepository.existsByCliente_Id(id)){
-            throw new ResponseStatusException(
-                    HttpStatus.CONFLICT,
-                    "No se puede eliminar el cliente con ID: "+id+ " porque tiene facturas emitas a su nombre"
-            );
+        if (ventasRepository.existsByCliente_Id(id)) {
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .body("No se puede eliminar el cliente con ID " + id +
+                            " porque tiene facturas emitidas a su nombre");
         }
 
         try {
             clientesRepository.deleteById(id);
+            return ResponseEntity.ok("Cliente eliminado correctamente.");
         } catch (Exception ex) {
-            throw new ResponseStatusException(
-                    HttpStatus.INTERNAL_SERVER_ERROR,
-                    "Error al eliminar el cliente: " + ex.getMessage()
-            );
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error al eliminar el cliente: " + ex.getMessage());
         }
     }
 }
