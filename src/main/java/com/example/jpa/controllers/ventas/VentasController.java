@@ -33,6 +33,7 @@ public class VentasController {
         return ventasRepository.findAll();
     }
 
+
     @GetMapping("/{id}")
     public ResponseEntity<VentasModel> getVentaById(@PathVariable Long id) {
         return ventasRepository.findById(id)
