@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.List;
 
 @RestController
@@ -49,7 +50,8 @@ public class ProveedoresController {
         }
         try {
             ZoneId zonaGT = ZoneId.of("America/Guatemala");
-            proveedor.setFechaRegistro(LocalDateTime.now(zonaGT));
+            ZonedDateTime ahoraGT = ZonedDateTime.now(zonaGT);
+            proveedor.setFechaRegistro(ahoraGT.toLocalDateTime());
             ProveedoresModel nuevo = proveedoresRepository.save(proveedor);
             return ResponseEntity.status(HttpStatus.CREATED)
                     .body("Proveedor creado correctamente con ID "+nuevo.getId());
@@ -87,13 +89,13 @@ public class ProveedoresController {
         if (!proveedoresRepository.existsById(id)) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body("No se puede eliminar el proveedor con ID: "+id+
-                            "no existe");
+                            " no existe");
         }
 
         if (comprasRepository.existsByProveedor_id(id)){
             return ResponseEntity.status(HttpStatus.CONFLICT)
                     .body("no se puede eliminar el proveedor con id: "+id+
-                            "porque tiene compras emitidas a su nombre");
+                            " porque tiene compras emitidas a su nombre");
         }
         try {
             proveedoresRepository.deleteById(id);

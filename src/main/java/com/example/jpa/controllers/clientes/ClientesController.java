@@ -12,6 +12,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.List;
 @RestController
 @RequestMapping("/api/cliente")
@@ -56,7 +57,8 @@ public class ClientesController {
 
         try {
             ZoneId zonaGT = ZoneId.of("America/Guatemala");
-            cliente.setFechaRegistro(LocalDateTime.now(zonaGT));
+            ZonedDateTime ahoraGT = ZonedDateTime.now(zonaGT);
+            cliente.setFechaRegistro(ahoraGT.toLocalDateTime());
             ClientesModel nuevo = clientesRepository.save(cliente);
             return ResponseEntity.status(HttpStatus.CREATED)
                     .body("Cliente creado correctamente con ID " + nuevo.getId());
