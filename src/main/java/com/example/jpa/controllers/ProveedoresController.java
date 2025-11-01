@@ -14,7 +14,7 @@ import java.time.ZoneId;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/proveedores")
+@RequestMapping("/api/proveedor")
 public class ProveedoresController {
 
     private final ProveedoresRepository proveedoresRepository;
