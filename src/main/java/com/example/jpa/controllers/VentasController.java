@@ -1,4 +1,4 @@
-package com.example.jpa.controllers.ventas;
+package com.example.jpa.controllers;
 
 import com.example.jpa.models.VentasModel;
 import com.example.jpa.repository.DetalleVentaRepository;
