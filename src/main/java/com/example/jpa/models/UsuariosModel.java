@@ -18,7 +18,7 @@ public class UsuariosModel {
     private String apellidos;
 
     @Column(name = "user_name", nullable = false, length = 100)
-    private String UserName;
+    private String userName;
 
     @Column(name = "password_hash", nullable = false)
     private String PasswordHash;
@@ -35,7 +35,7 @@ public class UsuariosModel {
     public UsuariosModel(String nombres, String apellidos, String userName, String passwordHash, String salt, LocalDateTime fechaRegistro) {
         this.nombres = nombres;
         this.apellidos = apellidos;
-        UserName = userName;
+        this.userName = userName;
         PasswordHash = passwordHash;
         this.salt = salt;
         this.fechaRegistro = fechaRegistro;
@@ -54,7 +54,7 @@ public class UsuariosModel {
     }
 
     public String getUserName() {
-        return UserName;
+        return userName;
     }
 
     public String getPasswordHash() {
@@ -79,7 +79,7 @@ public class UsuariosModel {
     }
 
     public void setUserName(String userName) {
-        UserName = userName;
+        this.userName = userName;
     }
 
     public void setPasswordHash(String passwordHash) {
