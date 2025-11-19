@@ -1,18 +1,25 @@
 package com.example.jpa.models;
 
+
+import java.time.LocalDate;
+
 public class CompraListResponse {
 
     private Long id;
     private String nombreProveedor;
-    private String fechaCompra;
+    private LocalDate fechaCompra;
     private String numeroFactura;
     private String serieFactura;
-    private double total;
-    private double descuentoAplicado;
+    private Double total;
+    private Double descuentoAplicado;
 
-    public CompraListResponse(Long id, String nombreProveedor, String fechaCompra,
-                              String numeroFactura, String serieFactura,
-                              double total, double descuentoAplicado) {
+    public CompraListResponse(Long id,
+                              String nombreProveedor,
+                              LocalDate fechaCompra,
+                              String numeroFactura,
+                              String serieFactura,
+                              Double total,
+                              Double descuentoAplicado) {
         this.id = id;
         this.nombreProveedor = nombreProveedor;
         this.fechaCompra = fechaCompra;
@@ -22,12 +29,11 @@ public class CompraListResponse {
         this.descuentoAplicado = descuentoAplicado;
     }
 
-    // GETTERS
     public Long getId() { return id; }
     public String getNombreProveedor() { return nombreProveedor; }
-    public String getFechaCompra() { return fechaCompra; }
+    public LocalDate getFechaCompra() { return fechaCompra; }
     public String getNumeroFactura() { return numeroFactura; }
     public String getSerieFactura() { return serieFactura; }
-    public double getTotal() { return total; }
-    public double getDescuentoAplicado() { return descuentoAplicado; }
+    public Double getTotal() { return total; }
+    public Double getDescuentoAplicado() { return descuentoAplicado; }
 }
