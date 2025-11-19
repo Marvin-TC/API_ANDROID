@@ -1,5 +1,6 @@
 package com.example.jpa.controllers;
 
+import com.example.jpa.models.CompraListResponse;
 import com.example.jpa.models.ComprasModel;
 import com.example.jpa.repository.ComprasRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,8 +21,8 @@ public class ComprasController {
     }
 
     @GetMapping
-    public List<ComprasModel> getAllCompras() {
-        return comprasRepository.findAll();
+    public List<CompraListResponse> getAllCompras() {
+        return comprasRepository.listarCompras();
     }
 
     @GetMapping("/{id}")
