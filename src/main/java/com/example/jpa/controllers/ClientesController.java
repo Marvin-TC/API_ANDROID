@@ -48,9 +48,19 @@ public class ClientesController {
                     .body("Debes enviar un cliente que no sea vacío");
         }
 
-        if (cliente.getNit() != null && clientesRepository.existsByNit(cliente.getNit())) {
-            return ResponseEntity.status(HttpStatus.CONFLICT)
-                    .body("Ya existe un cliente con el NIT " + cliente.getNit());
+        String nit = cliente.getNit();
+
+        if (nit != null) {
+            String nitNormalizado = nit.trim().toUpperCase();
+            // Ignorar CF y C/F
+            if (!nitNormalizado.equals("CF") && !nitNormalizado.equals("C/F")) {
+
+                if (clientesRepository.existsByNit(nit)) {
+                    return ResponseEntity.status(HttpStatus.CONFLICT)
+                            .body("Ya existe un cliente con el NIT " + nit);
+                }
+
+            }
         }
 
         try {
