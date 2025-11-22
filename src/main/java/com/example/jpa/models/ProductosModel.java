@@ -33,7 +33,7 @@ public class ProductosModel {
     @Column(nullable = false)
     private Boolean estado = true;
 
-    @Column(name = "fecha_registro", insertable = false, updatable = false)
+    @Column(name = "fecha_registro")
     private LocalDateTime fechaRegistro;
 
     public ProductosModel() {

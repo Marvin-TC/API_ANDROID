@@ -57,7 +57,7 @@ public class ProveedoresController {
                     .body("Proveedor creado correctamente con ID "+nuevo.getId());
         } catch (Exception ex){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body("Error al crear el proveedro: "+ex.getMessage());
+                    .body("Error al crear el proveedor: "+ex.getMessage());
         }
     }
 

@@ -27,7 +27,7 @@ public class ClientesModel {
     @Column(length = 200)
     private String correoElectronico;
 
-    @Column(name = "fecha_registro", insertable = false, updatable = false)
+    @Column(name = "fecha_registro")
     private LocalDateTime fechaRegistro;
 
     public ClientesModel() {

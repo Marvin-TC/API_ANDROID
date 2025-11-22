@@ -26,7 +26,7 @@ public class ProveedoresModel {
     @Column(nullable = false, length = 20)
     private String telefonoVendedor;
 
-    @Column(name = "fecha_registro", insertable = false, updatable = false)
+    @Column(name = "fecha_registro")
     private LocalDateTime fechaRegistro;
 
     public ProveedoresModel() {
