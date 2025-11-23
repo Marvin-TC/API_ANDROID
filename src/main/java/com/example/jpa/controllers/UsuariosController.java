@@ -1,5 +1,6 @@
 package com.example.jpa.controllers;
 
+import com.example.jpa.dto.LoginResponse;
 import com.example.jpa.models.UsuariosModel;
 import com.example.jpa.repository.UsuariosRepository;
 import com.example.jpa.utils.PasswordUtils;
@@ -45,11 +46,15 @@ public class UsuariosController {
             UsuariosModel usuario = usuarioOpt.get();
             byte[] hash = PasswordUtils.fromBase64(usuario.getPasswordHash());
             byte[] salt = PasswordUtils.fromBase64(usuario.getSalt());
-
             boolean valido = PasswordUtils.verify(password.toCharArray(), salt, hash);
-
             if (valido) {
-                return ResponseEntity.ok("Login exitoso. Bienvenido " + usuario.getUserName() + "!");
+                // Convertir los datos del usuario a JSON
+                LoginResponse response = new LoginResponse(
+                        usuario.getId(),
+                        usuario.getNombres() + " " + usuario.getApellidos(),
+                        usuario.getUserName()
+                );
+                return ResponseEntity.ok(response);
             } else {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                         .body("Usuario o contraseña incorrectos.");
